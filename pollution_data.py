@@ -9,9 +9,6 @@ def fetch_air_pollution_data(lat, lon, api_key):
         lat (float): Latitude of the location.
         lon (float): Longitude of the location.
         api_key (str): Your OpenWeatherMap API key.
-
-    Returns:
-        dict: The air pollution data as a dictionary.
     """
     url = f"http://api.openweathermap.org/data/2.5/air_pollution"
     params = {
@@ -22,7 +19,7 @@ def fetch_air_pollution_data(lat, lon, api_key):
 
     try:
         response = requests.get(url, params=params)
-        response.raise_for_status()  # Raise HTTPError for bad responses (4xx and 5xx)
+        response.raise_for_status()
 
         return extract_info_from_response(response.json())
     except requests.exceptions.RequestException as e:
