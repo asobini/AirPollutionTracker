@@ -2,7 +2,7 @@
 
 # Overview
 Cron job application that will periodically fetch the air quality (index and concentrations of pollutants) from the 
-openweathermap API.
+openweathermap API and store them in a Redis database.
 
 ## How to get started
 1. Get API key from https://openweathermap.org/
