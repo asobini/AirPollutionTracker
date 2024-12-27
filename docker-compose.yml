@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  celery_worker:
+    build:
+      context: .
+    container_name: celery_worker
+    command: celery -A cronjob worker --loglevel=info
+    depends_on:
+      - redis
+    env_file:
+      - .env
+
+  celery_beat:
+    build:
+      context: .
+    container_name: celery_beat
+    command: celery -A cronjob beat --loglevel=info
+    depends_on:
+      - redis
+    env_file:
+      - .env
