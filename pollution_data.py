@@ -23,7 +23,6 @@ def fetch_air_pollution_data(lat, lon, api_key):
 
         return extract_info_from_response(response.json())
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
         return None
 
 

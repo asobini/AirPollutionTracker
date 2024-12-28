@@ -6,6 +6,18 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  redis_insight:
+    image: redislabs/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
 
   celery_worker:
     build:
@@ -21,8 +33,27 @@ services:
     build:
       context: .
     container_name: celery_beat
-    command: celery -A cronjob beat --loglevel=info
+    command: celery -A cronjob beat --loglevel=error
     depends_on:
       - redis
     env_file:
       - .env
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=redis-datasource
+      - GF_LOG_LEVEL=error
+    depends_on:
+      - redis
+
+volumes:
+  grafana_data:
+  redis_data:
