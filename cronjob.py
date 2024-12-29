@@ -1,15 +1,16 @@
 import os
 from datetime import timedelta
 from celery import Celery
+from celery.signals import worker_ready
 from celery import chain
 from pollution_data import fetch_air_pollution_data
 from alert import send_email
-from redis_client import insert_data_to_redis
+from redis_client import create_redis_time_series, insert_time_series_data_to_redis
 
 # Get environment variables
 latitude = float(os.getenv('LATITUDE', '40.7128'))
 longitude = float(os.getenv('LONGITUDE', '-74.0060'))
-interval_in_seconds = float(os.getenv('INTERVAL_IN_SECONDS', '30'))
+interval_in_seconds = float(os.getenv('INTERVAL_IN_SECONDS', '10'))
 api_key = os.getenv('API_KEY')
 from_email = os.getenv('FROM_EMAIL')
 from_password = os.getenv('FROM_PASSWORD')
@@ -22,12 +23,22 @@ app = Celery(
 )
 
 
+@worker_ready.connect
+def at_worker_start(sender, **kwargs):
+    set_up_redis_time_series.apply_async()
+
+
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
         timedelta(seconds=interval_in_seconds),
         trigger_chain.s()
     )
+
+
+@app.task
+def set_up_redis_time_series():
+    create_redis_time_series()
 
 
 @app.task
@@ -39,7 +50,8 @@ def trigger_chain():
 @app.task
 def fetch_data():
     air_pollution_data = fetch_air_pollution_data(latitude, longitude, api_key)
-    insert_data_to_redis(air_pollution_data)
+    # insert_data_to_redis(air_pollution_data)
+    insert_time_series_data_to_redis(air_pollution_data)
     return air_pollution_data
 
 
