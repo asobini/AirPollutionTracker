@@ -1,11 +1,13 @@
 import redis
+from datetime import datetime
 
 redis = redis.StrictRedis(host='redis', port=6379, db=0, decode_responses=True)
 redis_time_series = redis.ts()
 
 
 def insert_time_series_data_to_redis(air_pollution_data):
-    timestamp = air_pollution_data['timestamp']
+    # convert timestamp to milliseconds
+    timestamp = air_pollution_data['timestamp'] * 1000
     air_quality_index = air_pollution_data['air_quality_index']
     co = air_pollution_data['components']['co']
     no = air_pollution_data['components']['no']
@@ -50,3 +52,8 @@ def create_redis_time_series():
         redis_time_series.create("pm10")
     if not redis.exists("nh3"):
         redis_time_series.create("nh3")
+
+
+def get_redis_time_series_data(key):
+    current_time_ms = int(datetime.utcnow().timestamp() * 1000)
+    return redis.execute_command('TS.RANGE', key, 0, current_time_ms)

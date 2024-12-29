@@ -1,3 +1,6 @@
 requests
 redis
 celery[redis]
+streamlit
+pandas
+numpy

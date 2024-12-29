@@ -39,5 +39,15 @@ services:
     env_file:
       - .env
 
+  streamlit_app:
+    build:
+      context: .
+    container_name: streamlit_app
+    ports:
+      - "8501:8501"
+    command: streamlit run streamlit_app.py
+    depends_on:
+      - redis
+
 volumes:
   redis_data:
