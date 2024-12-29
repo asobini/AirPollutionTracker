@@ -50,7 +50,6 @@ def trigger_chain():
 @app.task
 def fetch_data():
     air_pollution_data = fetch_air_pollution_data(latitude, longitude, api_key)
-    # insert_data_to_redis(air_pollution_data)
     insert_time_series_data_to_redis(air_pollution_data)
     return air_pollution_data
 

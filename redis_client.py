@@ -1,18 +1,7 @@
-import json
 import redis
 
 redis = redis.StrictRedis(host='redis', port=6379, db=0, decode_responses=True)
 redis_time_series = redis.ts()
-
-
-def insert_data_to_redis(air_pollution_data):
-    key = air_pollution_data['timestamp']
-    filtered_data = {
-        "air_quality_index": air_pollution_data['air_quality_index'],
-        "components": air_pollution_data['components'],
-    }
-    value = json.dumps(filtered_data)
-    redis.set(key, value)
 
 
 def insert_time_series_data_to_redis(air_pollution_data):
