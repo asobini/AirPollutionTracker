@@ -26,3 +26,6 @@ INTERVAL_IN_SECONDS=10
    - Username and password are 'admin'
    - Skip change password step
    - Navigate to Air Pollution Tracker under dashboards section
+
+## OpenWeather Pollution API Documentation
+https://openweathermap.org/api/air-pollution
