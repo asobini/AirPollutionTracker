@@ -4,3 +4,4 @@ celery[redis]
 streamlit
 pandas
 numpy
+prometheus_client

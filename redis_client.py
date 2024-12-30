@@ -1,5 +1,4 @@
 import redis
-from datetime import datetime
 
 redis = redis.StrictRedis(host='redis', port=6379, db=0, decode_responses=True)
 redis_time_series = redis.ts()
@@ -55,5 +54,4 @@ def create_redis_time_series():
 
 
 def get_redis_time_series_data(key):
-    current_time_ms = int(datetime.utcnow().timestamp() * 1000)
-    return redis.execute_command('TS.RANGE', key, 0, current_time_ms)
+    return redis_time_series.get(key)

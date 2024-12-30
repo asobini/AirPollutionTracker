@@ -9,15 +9,15 @@ services:
     volumes:
       - redis_data:/data
 
-  redis_insight:
-    image: redislabs/redisinsight:latest
-    container_name: redisinsight
-    ports:
-      - "5540:5540"
-    environment:
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - redis
+#  redis_insight:
+#    image: redislabs/redisinsight:latest
+#    container_name: redisinsight
+#    ports:
+#      - "5540:5540"
+#    environment:
+#      - REDIS_URL=redis://redis:6379
+#    depends_on:
+#      - redis
 
   celery_worker:
     build:
@@ -39,15 +39,37 @@ services:
     env_file:
       - .env
 
-  streamlit_app:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus  # Persistent local storage for Prometheus data
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+
+  prometheus_collector:
     build:
       context: .
-    container_name: streamlit_app
+    container_name: prometheus_collector
+    command: python3 prometheus_collector.py
     ports:
-      - "8501:8501"
-    command: streamlit run streamlit_app.py
-    depends_on:
-      - redis
+      - "5000:5000"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
 
 volumes:
   redis_data:
+  grafana_data:
+  prometheus_data:
