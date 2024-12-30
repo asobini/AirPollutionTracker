@@ -9,16 +9,6 @@ services:
     volumes:
       - redis_data:/data
 
-#  redis_insight:
-#    image: redislabs/redisinsight:latest
-#    container_name: redisinsight
-#    ports:
-#      - "5540:5540"
-#    environment:
-#      - REDIS_URL=redis://redis:6379
-#    depends_on:
-#      - redis
-
   celery_worker:
     build:
       context: .
@@ -45,10 +35,12 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus  # Persistent local storage for Prometheus data
     command:
       - --config.file=/etc/prometheus/prometheus.yml
+    depends_on:
+      - redis
 
   prometheus_collector:
     build:
@@ -57,6 +49,10 @@ services:
     command: python3 prometheus_collector.py
     ports:
       - "5000:5000"
+    depends_on:
+      - redis
+      - celery_worker
+      - celery_beat
 
   grafana:
     image: grafana/grafana:latest
@@ -64,10 +60,15 @@ services:
     ports:
       - "3000:3000"
     volumes:
+      - ./config/grafana/datasources/automatic.yml:/etc/grafana/provisioning/datasources/automatic.yml
+      - ./config/grafana/dashboards/main.yml:/etc/grafana/provisioning/dashboards/main.yml
+      - ./config/grafana/dashboards/airpollutiontracker.json:/var/lib/grafana/dashboards/airpollutiontracker.json
       - grafana_data:/var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - redis
 
 volumes:
   redis_data:

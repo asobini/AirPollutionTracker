@@ -54,4 +54,4 @@ def create_redis_time_series():
 
 
 def get_redis_time_series_data(key):
-    return redis_time_series.get(key)
+    return redis.execute_command('TS.GET', key)
