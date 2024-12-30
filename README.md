@@ -8,6 +8,8 @@ After fetching the pollution data, it is then stored as time series data in the 
 
 The time series data from Redis is then displayed in a Grafana dashboard using Prometheus as a data source.
 
+![air pollution tracker](https://github.com/user-attachments/assets/9ef35ee2-2199-46a5-b3ca-051e4b268cd7)
+
 ## How to get started
 1. Create account and get API key from https://openweathermap.org/ (verify email and there might be a short delay for API key to become active)
 2. Create .env file in the root of the project with variables LATITUDE, LONGITUDE, API_KEY, INTERVAL_IN_SECONDS
