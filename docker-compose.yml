@@ -10,18 +10,21 @@ services:
       - redis_data:/data
 
   celery_worker:
-    build: .
-    user: "appuser"  # Keep this line
-    command: celery -A cronjob worker --loglevel=info
+    build:
+      context: .
     container_name: celery_worker
+    user: "appuser"  # 👈 Added user specification
+    command: celery -A cronjob worker --loglevel=info
     depends_on:
       - redis
     env_file:
       - .env
 
   celery_beat:
-    build: .
-    user: "appuser"  # Keep this line
+    build:
+      context: .
+    container_name: celery_beat
+    user: "appuser"  # 👈 Added user specification
     command: celery -A cronjob beat --loglevel=error
     depends_on:
       - redis
@@ -35,7 +38,7 @@ services:
       - "9090:9090"
     volumes:
       - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus_data:/prometheus  # Persistent local storage for Prometheus data
+      - prometheus_data:/prometheus
     command:
       - --config.file=/etc/prometheus/prometheus.yml
     depends_on:
