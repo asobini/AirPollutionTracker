@@ -10,19 +10,18 @@ services:
       - redis_data:/data
 
   celery_worker:
-    build:
-      context: .
-    container_name: celery_worker
+    build: .
+    user: "appuser"  # Keep this line
     command: celery -A cronjob worker --loglevel=info
+    container_name: celery_worker
     depends_on:
       - redis
     env_file:
       - .env
 
   celery_beat:
-    build:
-      context: .
-    container_name: celery_beat
+    build: .
+    user: "appuser"  # Keep this line
     command: celery -A cronjob beat --loglevel=error
     depends_on:
       - redis
@@ -48,7 +47,7 @@ services:
     container_name: prometheus_collector
     command: python3 prometheus_collector.py
     ports:
-      - "5000:5000"
+      - "5001:5000"
     depends_on:
       - redis
       - celery_worker
